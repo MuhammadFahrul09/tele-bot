@@ -1,6 +1,6 @@
 import { Bot, CommandContext, Context } from "grammy";
 import ClientBot from "./ClientBot";
-import { BotCommand, User } from "grammy/types";
+import { BotCommand, InputFile, User } from "grammy/types";
 import StorageService from "./StorageService";
 
 export class AdminBot {
@@ -54,6 +54,15 @@ export class AdminBot {
         this.storage.getAuthenticatedAdminChatIds().then(chatIds => {
             chatIds.forEach(chatId => {
                 this.bot.api.sendMessage(chatId, message);
+            })
+        })
+    }
+
+    sendMediaMessageToAdmins(message: string, fileUrl: string){
+        this.sendMessageToAdmins(message);
+        this.storage.getAuthenticatedAdminChatIds().then(chatIds => {
+            chatIds.forEach(chatId => {
+                this.bot.api.sendPhoto(chatId, new InputFile({url: fileUrl}));
             })
         })
     }

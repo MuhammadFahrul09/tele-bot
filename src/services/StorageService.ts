@@ -9,6 +9,16 @@ export default class StorageService {
     }
 
     async saveAuthenticatedAdmin(account: TelegramAccount, chatId: number){
+        const isExist = await this.db.adminAccount.count({
+            where: {
+                id: account.id
+            }
+        })
+
+        if (isExist) {
+            return;
+        }
+
         await this.db.adminAccount.create({
             data: {
                 ...account,
@@ -30,11 +40,22 @@ export default class StorageService {
     }
 
     async saveClient(account: TelegramAccount, chatId: number){
+        
+        const isExist = await this.db.clientAccount.count({
+            where: {
+                id: account.id
+            }
+        })
+
+        if (isExist) {
+            return;
+        }
+
         await this.db.clientAccount.create({
             data: {
                 ...account,
                 chat_id: chatId
-            }
+            },
         })
     }
 }
