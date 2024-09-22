@@ -25,7 +25,12 @@ export default class ClientBot {
     async init(){
         await this.bot.api.setMyCommands(this.commands);
         this.setListeners();
-        this.bot.start();
+        console.log("Client bot is starting")
+        this.bot.start({
+            onStart(botInfo) {
+                console.log("Client bot is started, username " + botInfo.username)
+            },
+        });
     }
 
     setAdmin(admin: AdminBot){
@@ -38,6 +43,11 @@ export default class ClientBot {
                 message_id: messageId
             }
         })
+    }
+
+    async stop(){
+        console.log("Shutting down Client bot")
+        await this.bot.stop()
     }
 
     private setListeners(){

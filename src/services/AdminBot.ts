@@ -38,7 +38,12 @@ export class AdminBot {
                 }
             }
         })
-        this.bot.start();
+        console.log("Admin bot is starting")
+        this.bot.start({
+            onStart(botInfo) {
+                console.log("Admin bot is started, username " + botInfo.username)
+            },
+        });
     }
 
     setClient(client: ClientBot){
@@ -53,7 +58,10 @@ export class AdminBot {
         })
     }
 
-    // private formatMessage(message)
+    async stop(){
+        console.log("Shutting down Admin bot")
+        await this.bot.stop()
+    }
 
     private authenticateAdmin(ctx: CommandContext<Context>){
         const secret = ctx.match;

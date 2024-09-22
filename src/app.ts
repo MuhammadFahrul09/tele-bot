@@ -19,5 +19,15 @@ const admin = new AdminBot(adminBot, storage);
 client.setAdmin(admin);
 admin.setClient(client);
 
+
+const stopBots = () => {
+    console.log("Shutting down");
+    client.stop();
+    admin.stop();
+}
+
+process.once("SIGINT", () => stopBots);
+process.once("SIGTERM", () =>stopBots);
+
 client.init();
 admin.init();
