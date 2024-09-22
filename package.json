@@ -1,7 +1,8 @@
 {
   "scripts": {
     "build": "tsc",
-    "start": "node build/app.js"
+    "start": "node build/app.js",
+    "start:prod": "prisma migrate deploy && node build/app.js"
   },
   "devDependencies": {
     "@types/node": "^22.5.5",
