@@ -26,9 +26,9 @@ export const commandList: BotCommandWithExample[] = [
         example: "/prof 084328347384"
     },
     { 
-        command: "email", 
-        description: "Pencarian data EMAIL berdasarkan MEDIA SOSIAL" ,
-        example: "/email email@contoh.com"
+        command: "/nikfoto", 
+        description: "Percarian foto berdasarkan NIK" ,
+        example: "/nikfoto 23456784560001"
     },
     { 
         command: "nopol", 
@@ -51,11 +51,6 @@ export const commandList: BotCommandWithExample[] = [
         example: "/pln 304594050"
     },
     { 
-        command: "rek", 
-        description: "Pencarian data NOMOR REKENING BANK" ,
-        example: "/rek 23434324"
-    },
-    { 
         command: "nkk", 
         description: "Pencarian data KARTU KELUARGA" ,
         example: "/nkk 230894859402349"
@@ -64,6 +59,11 @@ export const commandList: BotCommandWithExample[] = [
         command: "nama2", 
         description: "Pencarian data NAMA " ,
         example: "/nama2 Budi"
+    },
+    { 
+        command: "gc", 
+        description: "Pencarian nama Getcontact berdasarkan NOMOR HP" ,
+        example: "/gc +6282784573xxx"
     },
     { 
         command: "traceimei", 
@@ -76,34 +76,14 @@ export const commandList: BotCommandWithExample[] = [
         example: "/track 0823948948"
     },
     { 
-        command: "fr", 
-        description: "FACE RECOGNITION. Pencarian NIK berdasarkan PENGENALAN WAJAH (foto)" ,
-        example: "/fr"
-    },
-    { 
         command: "cp", 
         description: "(pencarian lokasi khusus provdr tsel)" ,
         example: "/cp 085322204349"
     },
     { 
-        command: "nikag", 
-        description: "(pncrian data kesehatan)" ,
-        example: "/nikag 0938492394"
-    },
-    { 
-        command: "nama", 
-        description: "Pencarian data berdasarkan nama" ,
-        example: "/nama Budi"
-    },
-    { 
-        command: "nik", 
-        description: "Pencarian data berdasarkan NIK" ,
-        example: "/nik 2439480239498"
-    },
-    { 
-        command: "kk", 
-        description: "Pencarian data berdasarkan KK" ,
-        example: "/kk 2349834938"
+        command: "fr", 
+        description: "FACE RECOGNITION. Pencarian NIK berdasarkan PENGENALAN WAJAH (foto)" ,
+        example: "/fr"
     },
     {
         command: "help",
