@@ -26,7 +26,7 @@ export const commandList: BotCommandWithExample[] = [
         example: "/prof 084328347384"
     },
     { 
-        command: "/nikfoto", 
+        command: "nikfoto", 
         description: "Percarian foto berdasarkan NIK" ,
         example: "/nikfoto 23456784560001"
     },
