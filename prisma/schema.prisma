@@ -11,7 +11,7 @@ datasource db {
 }
 
 model AdminAccount {
-  id         Int    @id
+  id         BigInt   @id
   first_name String
   last_name  String
   username   String
@@ -19,7 +19,7 @@ model AdminAccount {
 }
 
 model ClientAccount {
-  id         Int    @id
+  id         BigInt  @id
   first_name String
   last_name  String
   username   String
@@ -34,7 +34,7 @@ model ClientMessage {
   account         ClientAccount @relation(fields: [clientAccountId], references: [id])
   date            DateTime
   text            String
-  clientAccountId Int
+  clientAccountId BigInt
   Inquiries       Inquiries[]
 }
 
@@ -42,6 +42,6 @@ model Inquiries {
   id              Int           @id @default(autoincrement())
   from            ClientAccount @relation(fields: [clientAccountId], references: [id])
   clientMessage   ClientMessage @relation(fields: [clientMessageId], references: [id])
-  clientAccountId Int
+  clientAccountId BigInt
   clientMessageId Int
 }
