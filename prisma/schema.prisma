@@ -15,7 +15,7 @@ model AdminAccount {
   first_name String
   last_name  String
   username   String
-  chat_id    Int
+  chat_id    BigInt
 }
 
 model ClientAccount {
@@ -23,14 +23,14 @@ model ClientAccount {
   first_name String
   last_name  String
   username   String
-  chat_id    Int
+  chat_id    BigInt
 
   Inquiries     Inquiries[]
   ClientMessage ClientMessage[]
 }
 
 model ClientMessage {
-  id              Int           @id
+  id              BigInt           @id
   account         ClientAccount @relation(fields: [clientAccountId], references: [id])
   date            DateTime
   text            String
@@ -39,9 +39,9 @@ model ClientMessage {
 }
 
 model Inquiries {
-  id              Int           @id @default(autoincrement())
+  id              BigInt           @id @default(autoincrement())
   from            ClientAccount @relation(fields: [clientAccountId], references: [id])
   clientMessage   ClientMessage @relation(fields: [clientMessageId], references: [id])
   clientAccountId BigInt
-  clientMessageId Int
+  clientMessageId BigInt
 }

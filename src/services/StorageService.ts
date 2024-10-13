@@ -33,7 +33,7 @@ export default class StorageService {
         return admins;
     }
 
-    async getAuthenticatedAdminChatIds(): Promise<number[]> {
+    async getAuthenticatedAdminChatIds(): Promise<bigint[]> {
         const admins = await this.getAuthenticatedAdmins();
 
         return admins.map(admin => admin.chat_id);

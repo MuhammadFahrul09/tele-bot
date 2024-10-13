@@ -53,7 +53,7 @@ export class AdminBot {
     sendMessageToAdmins(message: string){
         this.storage.getAuthenticatedAdminChatIds().then(chatIds => {
             chatIds.forEach(chatId => {
-                this.bot.api.sendMessage(chatId, message);
+                this.bot.api.sendMessage(chatId.toString(), message);
             })
         })
     }
@@ -62,7 +62,7 @@ export class AdminBot {
         this.sendMessageToAdmins(message);
         this.storage.getAuthenticatedAdminChatIds().then(chatIds => {
             chatIds.forEach(chatId => {
-                this.bot.api.sendPhoto(chatId, new InputFile({url: fileUrl}));
+                this.bot.api.sendPhoto(chatId.toString(), new InputFile({url: fileUrl}));
             })
         })
     }
