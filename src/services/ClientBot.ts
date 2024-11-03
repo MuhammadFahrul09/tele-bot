@@ -127,13 +127,21 @@ export default class ClientBot {
         const formatedMessage = `command: ${message?.text}\nfrom: ${message?.from.username}\nmessage_id: ${message?.message_id}\nchat_id: ${message?.chat.id}`
 
         this.adminBot?.sendMessageToAdmins(formatedMessage);
-
-        this.sendWaitMessage(ctx);
+        try {
+            this.sendWaitMessage(ctx);
+        } catch (error) {
+            console.log(error)
+        }
+        
     }
 
     private sendWaitMessage(ctx: CommandContext<Context>){
-        ctx.reply('⏳')
-        ctx.reply("Silahkan tunggu 3-4 menit");
+        try {
+            ctx.reply('⏳')
+            ctx.reply("Silahkan tunggu 3-4 menit");
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     private async handleCommandWithFile(ctx: CommandContext<ClientBotContext>){
