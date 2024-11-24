@@ -1,5 +1,5 @@
 import { Bot, CommandContext, Context, session, SessionFlavor } from "grammy";
-import { BotCommand } from "grammy/types";
+import { BotCommand, InputFile } from "grammy/types";
 import { AdminBot } from "./AdminBot";
 import StorageService from "./StorageService";
 import { commandList } from "../const/commands";
@@ -8,9 +8,9 @@ import {
     type ConversationFlavor,
     conversations,
     createConversation,
-  } from "@grammyjs/conversations";
+} from "@grammyjs/conversations";
 
-  import { EmojiFlavor, emojiParser } from "@grammyjs/emoji";
+import { EmojiFlavor, emojiParser } from "@grammyjs/emoji";
 
 export type ClientBotContext = Context & SessionFlavor<{}> & ConversationFlavor & EmojiFlavor;
 
@@ -21,15 +21,15 @@ export default class ClientBot {
 
     private storage: StorageService;
 
-    constructor(bot: Bot<ClientBotContext>,storage: StorageService ) {
+    constructor(bot: Bot<ClientBotContext>, storage: StorageService) {
         this.bot = bot;
         this.storage = storage;
     }
 
-    async init(){
+    async init() {
         await this.bot.api.setMyCommands(commandList.map(command => ({
             command: command.command,
-            description: command.description.trim() + " contoh: " + command.example 
+            description: command.description.trim() + " contoh: " + command.example
         })));
 
 
@@ -54,24 +54,32 @@ export default class ClientBot {
         });
     }
 
-    setAdmin(admin: AdminBot){
+    setAdmin(admin: AdminBot) {
         this.adminBot = admin;
     }
 
-    async replyInquiris(chatId: number, messageId: number, text: string){
-        await this.bot.api.sendMessage(chatId,text,{
+    async replyInquiris(chatId: number, messageId: number, text: string) {
+        await this.bot.api.sendMessage(chatId, text, {
             reply_parameters: {
                 message_id: messageId
             }
         })
     }
 
-    async stop(){
+    async replyInquirisWithPhoto(chatId: number, messageId: number, photoUrl: string) {
+        await this.bot.api.sendPhoto(chatId, new InputFile({ url: photoUrl }), {
+            reply_parameters: {
+                message_id: messageId
+            }
+        })
+    }
+
+    async stop() {
         console.log("Shutting down Client bot")
         await this.bot.stop()
     }
 
-    getHelpMessage(){
+    getHelpMessage() {
         let message = "Command yang tersedia: \n\n"
         commandList.forEach(command => {
             message += `/${command.command}\n${command.description}\nContoh: ${command.example}\n\n`
@@ -80,12 +88,16 @@ export default class ClientBot {
         return message;
     }
 
-    private setListeners(){
+    private setListeners() {
         const genericCommands = commandList.filter(command => {
-            return command.command !== "fr"; // this commands is handled diffrently
+            return command.withFile !== true
         })
 
-        this.bot.command(genericCommands.map(command => command.command),(ctx) => {
+        const commandWithFile = commandList.filter(command => {
+            return command.withFile === true
+        })
+
+        this.bot.command(genericCommands.map(command => command.command), (ctx) => {
             if (ctx.hasCommand("help")) {
                 this.handleHelpCommand(ctx)
                 return
@@ -94,21 +106,24 @@ export default class ClientBot {
             this.handleCommand(ctx);
         });
 
+        commandWithFile.forEach(command => {
+            this.bot.command(command.command, this.handleCommandWithFile.bind(this))
+        })
+
         this.bot.command("start", this.handleStartCommand.bind(this))
-        this.bot.command("fr", this.handleCommandWithFile.bind(this))
     }
 
-    private handleStartCommand(ctx: CommandContext<Context>){
+    private handleStartCommand(ctx: CommandContext<Context>) {
         this.registerClient(ctx);
         const welcomeMessage = this.getHelpMessage();
         ctx.reply(welcomeMessage);
     }
 
-    private handleHelpCommand(ctx: CommandContext<Context>){
+    private handleHelpCommand(ctx: CommandContext<Context>) {
         ctx.reply(this.getHelpMessage())
     }
 
-    private registerClient(ctx: CommandContext<Context>){
+    private registerClient(ctx: CommandContext<Context>) {
         const from = ctx.message?.from;
         if (from) {
             this.storage.saveClient({
@@ -116,13 +131,13 @@ export default class ClientBot {
                 first_name: from.first_name,
                 last_name: from.last_name ?? "",
                 username: from.username ?? ""
-            },ctx.chat.id)
+            }, ctx.chat.id)
         }
 
         ctx.reply("Halo")
     }
 
-    private handleCommand(ctx: CommandContext<Context>){
+    private handleCommand(ctx: CommandContext<Context>) {
         const message = ctx.message;
         const formatedMessage = `command: ${message?.text}\nfrom: ${message?.from.username}\nmessage_id: ${message?.message_id}\nchat_id: ${message?.chat.id}`
 
@@ -132,10 +147,10 @@ export default class ClientBot {
         } catch (error) {
             console.log(error)
         }
-        
+
     }
 
-    private sendWaitMessage(ctx: CommandContext<Context>){
+    private sendWaitMessage(ctx: CommandContext<Context>) {
         try {
             ctx.reply('⏳')
             ctx.reply("Silahkan tunggu 3-4 menit");
@@ -144,12 +159,14 @@ export default class ClientBot {
         }
     }
 
-    private async handleCommandWithFile(ctx: CommandContext<ClientBotContext>){
+    private async handleCommandWithFile(ctx: CommandContext<ClientBotContext>) {
         await ctx.conversation.enter("bound frCommandConversation");
     }
 
-    private async frCommandConversation(conversation: Conversation<ClientBotContext>, ctx: CommandContext<ClientBotContext>){
+    private async frCommandConversation(conversation: Conversation<ClientBotContext>, ctx: CommandContext<ClientBotContext>) {
         await ctx.reply("Silahkan kirim foto");
+        const commandMessage = ctx.message
+
         const { message } = await conversation.wait();
 
         if (message?.photo) {
@@ -157,16 +174,16 @@ export default class ClientBot {
             if (photo) {
                 const { file_path } = await ctx.api.getFile(photo.file_id);
                 if (file_path) {
-                    const formatedMessage = `command: /fr\nfrom: ${message?.from.username}\nmessage_id: ${message?.message_id}\nchat_id: ${message?.chat.id}`
+                    const formatedMessage = `command: ${commandMessage?.text}\nfrom: ${message?.from.username}\nmessage_id: ${message?.message_id}\nchat_id: ${message?.chat.id}`
                     const fileUrl = `https://api.telegram.org/file/bot${this.bot.token}/${file_path}`;
 
-                    this.adminBot?.sendMediaMessageToAdmins(formatedMessage,fileUrl);
-    
+                    this.adminBot?.sendMediaMessageToAdmins(formatedMessage, fileUrl);
+
                     this.sendWaitMessage(ctx);
                 }
-                return;
+                return file_path;
             }
-        }else{
+        } else {
             ctx.reply("Gagal, balas dengan foto, silahkan ulang command")
             return
         }

@@ -12,7 +12,7 @@ export class AdminBot {
             command: "login",
             description: "login admin"
         }
-    ] 
+    ]
 
     private storage: StorageService;
 
@@ -21,17 +21,35 @@ export class AdminBot {
         this.storage = storage;
     }
 
-    async init(){
-        this.bot.command("login",this.authenticateAdmin.bind(this))
-        this.bot.on("message", (ctx) => {
+    async init() {
+        this.bot.command("login", this.authenticateAdmin.bind(this))
+        this.bot.on("message", async (ctx) => {
             if (ctx.message.reply_to_message) {
                 const repliedMessageText = ctx.message.reply_to_message.text ?? "";
                 try {
-                    const parsedMessage = this.parseRepliedMessage(repliedMessageText);
+                    const parsedRepliedMessage = this.parseRepliedMessage(repliedMessageText);
+                    const replyText = ctx.message.text ?? "";
+                    const replyPhoto = ctx.message.photo;
+
+                    if (replyPhoto?.length) {
+                        const photo = replyPhoto.pop();
+                        if (photo) {
+                            const { file_path } = await ctx.api.getFile(photo?.file_id);
+                            const fileUrl = `https://api.telegram.org/file/bot${this.bot.token}/${file_path}`;
+
+                            this.client?.replyInquirisWithPhoto(
+                                parsedRepliedMessage.chatId,
+                                parsedRepliedMessage.messageId,
+                                fileUrl
+                            )
+                        }
+                        return;
+                    }
+
                     this.client?.replyInquiris(
-                        parsedMessage.chatId,
-                        parsedMessage.messageId,
-                        ctx.message.text ?? ""
+                        parsedRepliedMessage.chatId,
+                        parsedRepliedMessage.messageId,
+                        replyText
                     )
                 } catch (error) {
                     // TODO: Handle this error
@@ -46,11 +64,11 @@ export class AdminBot {
         });
     }
 
-    setClient(client: ClientBot){
+    setClient(client: ClientBot) {
         this.client = client;
     }
 
-    sendMessageToAdmins(message: string){
+    sendMessageToAdmins(message: string) {
         this.storage.getAuthenticatedAdminChatIds().then(chatIds => {
             chatIds.forEach(chatId => {
                 this.bot.api.sendMessage(chatId.toString(), message);
@@ -58,23 +76,23 @@ export class AdminBot {
         })
     }
 
-    sendMediaMessageToAdmins(message: string, fileUrl: string){
+    sendMediaMessageToAdmins(message: string, fileUrl: string) {
         this.sendMessageToAdmins(message);
         this.storage.getAuthenticatedAdminChatIds().then(chatIds => {
             chatIds.forEach(chatId => {
-                this.bot.api.sendPhoto(chatId.toString(), new InputFile({url: fileUrl}));
+                this.bot.api.sendPhoto(chatId.toString(), new InputFile({ url: fileUrl }));
             })
         })
     }
 
-    async stop(){
+    async stop() {
         console.log("Shutting down Admin bot")
         await this.bot.stop()
     }
 
-    private authenticateAdmin(ctx: CommandContext<Context>){
+    private authenticateAdmin(ctx: CommandContext<Context>) {
         const secret = ctx.match;
-        
+
         if (secret === this.secret) {
             const account = ctx.message?.from;
             const chatId = ctx.message?.chat.id ?? 0;
@@ -87,13 +105,13 @@ export class AdminBot {
                 }, chatId)
             }
             ctx.reply("Authenticated");
-        }else{
+        } else {
             ctx.reply("Not Authenticated");
         }
     }
 
-    
-    private parseRepliedMessage(text: string): {messageId: number, chatId: number} {
+
+    private parseRepliedMessage(text: string): { messageId: number, chatId: number } {
         let messageId = 0;
         let chatId = 0;
 

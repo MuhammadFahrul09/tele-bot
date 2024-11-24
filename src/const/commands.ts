@@ -1,7 +1,8 @@
 import { BotCommand } from "grammy/types"
 
 type BotCommandWithExample = BotCommand & {
-    example: string
+    example: string,
+    withFile?: boolean
 }
 
 export const commandList: BotCommandWithExample[] = [
@@ -83,7 +84,8 @@ export const commandList: BotCommandWithExample[] = [
     { 
         command: "fr", 
         description: "FACE RECOGNITION. Pencarian NIK berdasarkan PENGENALAN WAJAH (foto)" ,
-        example: "/fr"
+        example: "/fr",
+        withFile: true
     },
     {
         command: "help",
