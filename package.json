@@ -13,6 +13,8 @@
     "@grammyjs/conversations": "^1.2.0",
     "@grammyjs/emoji": "^1.2.0",
     "@prisma/client": "5.19.1",
+    "@sentry/node": "^8.47.0",
+    "@sentry/profiling-node": "^8.47.0",
     "grammy": "^1.34.0"
   }
 }

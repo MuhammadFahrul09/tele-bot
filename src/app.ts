@@ -3,6 +3,7 @@ import ClientBot, { ClientBotContext } from './services/ClientBot'
 import { AdminBot } from "./services/AdminBot";
 import StorageService from "./services/StorageService";
 import { PrismaClient } from "@prisma/client";
+import "./libs/sentry";
 
 const USER_BOT_TOKEN = process.env.USER_BOT_TOKEN as string;
 const ADMIN_BOT_TOKEN = process.env.ADMIN_BOT_TOKEN as string;
