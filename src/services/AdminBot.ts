@@ -1,6 +1,6 @@
 import { Bot, CommandContext, Context } from "grammy";
 import ClientBot from "./ClientBot";
-import { BotCommand, InputFile, User } from "grammy/types";
+import { BotCommand, InputFile, Message, User } from "grammy/types";
 import StorageService from "./StorageService";
 import * as Sentry from "@sentry/node"
 
@@ -26,7 +26,7 @@ export class AdminBot {
         this.bot.command("login", this.authenticateAdmin.bind(this))
         this.bot.on("message", async (ctx) => {
             if (ctx.message.reply_to_message) {
-                const repliedMessageText = ctx.message.reply_to_message.text ?? "";
+                const repliedMessageText = this.getRepliedMessageText(ctx.message);
                 try {
                     const parsedRepliedMessage = this.parseRepliedMessage(repliedMessageText);
                     const replyText = ctx.message.text ?? "";
@@ -83,11 +83,12 @@ export class AdminBot {
     }
 
     sendMediaMessageToAdmins(message: string, fileUrl: string) {
-        this.sendMessageToAdmins(message);
         this.storage.getAuthenticatedAdminChatIds().then(chatIds => {
             chatIds.forEach(chatId => {
                 try {
-                    this.bot.api.sendPhoto(chatId.toString(), new InputFile({ url: fileUrl }));
+                    this.bot.api.sendPhoto(chatId.toString(), new InputFile({ url: fileUrl }), {
+                        caption: message
+                    });
                 } catch (error) {
                     Sentry.captureException(error);
                 }
@@ -144,5 +145,19 @@ export class AdminBot {
             messageId,
             chatId
         }
+    }
+
+    private getRepliedMessageText(message: Message){
+        if (message.reply_to_message) {
+            if (message.reply_to_message.text) {
+                return message.reply_to_message.text;
+            }
+
+            if (message.reply_to_message.caption) {
+                return message.reply_to_message.caption;
+            }
+        }
+
+        return "";
     }
 }
