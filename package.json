@@ -16,5 +16,11 @@
     "@sentry/node": "^8.47.0",
     "@sentry/profiling-node": "^8.47.0",
     "grammy": "^1.34.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "volta": {
+    "node": "22.14.0"
   }
 }

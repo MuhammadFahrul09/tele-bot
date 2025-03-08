@@ -2,6 +2,7 @@ import { Bot, CommandContext, Context } from "grammy";
 import ClientBot from "./ClientBot";
 import { BotCommand, InputFile, User } from "grammy/types";
 import StorageService from "./StorageService";
+import * as Sentry from "@sentry/node"
 
 export class AdminBot {
     private bot: Bot;
@@ -53,6 +54,7 @@ export class AdminBot {
                     )
                 } catch (error) {
                     // TODO: Handle this error
+                    Sentry.captureException(error);
                 }
             }
         })
@@ -71,7 +73,11 @@ export class AdminBot {
     sendMessageToAdmins(message: string) {
         this.storage.getAuthenticatedAdminChatIds().then(chatIds => {
             chatIds.forEach(chatId => {
-                this.bot.api.sendMessage(chatId.toString(), message);
+                try {
+                    this.bot.api.sendMessage(chatId.toString(), message);
+                } catch (error) {
+                    Sentry.captureException(error);
+                }
             })
         })
     }
@@ -80,7 +86,11 @@ export class AdminBot {
         this.sendMessageToAdmins(message);
         this.storage.getAuthenticatedAdminChatIds().then(chatIds => {
             chatIds.forEach(chatId => {
-                this.bot.api.sendPhoto(chatId.toString(), new InputFile({ url: fileUrl }));
+                try {
+                    this.bot.api.sendPhoto(chatId.toString(), new InputFile({ url: fileUrl }));
+                } catch (error) {
+                    Sentry.captureException(error);
+                }
             })
         })
     }
