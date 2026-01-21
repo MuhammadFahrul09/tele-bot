@@ -130,8 +130,6 @@ export class AdminBot {
 
         const match = regexPattern.exec(text);
 
-        console.log(match);
-
         if (match && match.groups) {
             messageId = parseInt(match.groups["message_id"])
             chatId = parseInt(match.groups["chat_id"]);
@@ -147,7 +145,7 @@ export class AdminBot {
         }
     }
 
-    private getRepliedMessageText(message: Message){
+    private getRepliedMessageText(message: Message) {
         if (message.reply_to_message) {
             if (message.reply_to_message.text) {
                 return message.reply_to_message.text;
