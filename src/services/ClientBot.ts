@@ -12,7 +12,7 @@ import {
 
 import { EmojiFlavor, emojiParser } from "@grammyjs/emoji";
 
-export type ClientBotContext = Context & SessionFlavor<{}> & ConversationFlavor & EmojiFlavor;
+export type ClientBotContext = Context & SessionFlavor<{}> & ConversationFlavor<Context> & EmojiFlavor;
 
 export default class ClientBot {
     private bot: Bot<ClientBotContext>;
